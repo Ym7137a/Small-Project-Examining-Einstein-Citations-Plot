@@ -1,0 +1,45 @@
+---
+title: "Einstein Report"
+author: "David Gerard"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Abstract
+
+I look at some of Einstein's citation counts from Scopus.
+
+# Analysis
+
+These data come from a [Scopus](https://www.scopus.com/home.uri) search of Einstein's citations. I exported the citations from 2004 to 2019 for all of his papers.
+
+Here is a histogram of his total citations (not just from 2004 to 2019):
+
+![](../output/paper_hist.png)
+
+And here is a line plot of his citations from 2004 to 2019:
+
+![](../output/citefig.png)
+
+But let's look at hist total citations for each year:
+
+```{r, message = FALSE}
+library(tidyverse)
+ein <- read_csv("../output/ein_long.csv")
+ein %>%
+  filter(year != "<2004") %>%
+  group_by(year) %>%
+  summarize(tot = sum(cites)) %>%
+  mutate(year = parse_number(year)) %>%
+  ggplot(aes(x = year, y = tot)) +
+  geom_line() +
+  theme_bw() +
+  ylab("Citations") +
+  xlab("Year")
+```
+
+Note: It would be hard to state just from these data if Einstein is getting even more relevant, or if there are just more articles being released than there were fifteen years ago.

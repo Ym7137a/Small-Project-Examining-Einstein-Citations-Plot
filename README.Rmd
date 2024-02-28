@@ -1,0 +1,51 @@
+---
+output: github_document
+title: "Small Project Examining Einstein Citations"
+author: "David Gerard"
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+This small project just creates some plots of Einstein's citation counts, as measured by [Scopus](https://www.scopus.com/home.uri).
+
+The files after everything is evaluated are:
+
+```{r}
+list.files(recursive = TRUE)
+```
+
+
+These files have the following dependency structure:
+
+```{r dependency-graph, message = FALSE, echo = FALSE, fig.width=10}
+library(tidyverse)
+library(ggdag)
+set.seed(15)
+dagify("ein_long.csv" ~ "ein_tidy.R",
+       "ein_long.csv" ~ "ein_cites.csv",
+       "ein_tot.csv" ~ "ein_calc_tot.R",
+       "ein_tot.csv" ~ "ein_long.csv",
+       "citefig.png" ~ "all_paper_fig.R",
+       "citefig.png" ~ "ein_long.csv",
+       "paper_hist.png" ~ "make_hist.R",
+       "paper_hist.png" ~ "ein_tot.csv",
+       "ein_report.html" ~ "ein_report.Rmd",
+       "ein_report.html" ~ "citefig.png",
+       "ein_report.html" ~ "paper_hist.png",
+       "ein_report.html" ~ "ein_tot.csv") %>%
+  ggdag(layout = "sugiyama",
+        text_col = "black",
+        node = FALSE) +
+  theme_void() +
+  xlim(-0.5, 5.5)
+```
+
+Modify the Makefile to automatically evaluate this pipeline. You can always check if the Makefile works by deleting everything in the output folder and rerunning `make` in the terminal. If "analysis/ein_report.html" is re-generated, then you are good to go.
